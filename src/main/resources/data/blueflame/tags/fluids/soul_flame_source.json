@@ -1,0 +1,13 @@
+{
+    "replace": false,
+    "values": [
+        {
+            "id": "allthemodium:soul_lava",
+            "required": false
+        },
+        {
+            "id": "allthemodium:flowing_soul_lava",
+            "required": false
+        }
+    ]
+}

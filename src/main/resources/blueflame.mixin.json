@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "package": "cy.jdkdigital.blueflame.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "MixinBaseFireBlock",
+    "MixinEntity",
+    "MixinZombie"
+  ],
+  "client": [
+    "client.MixinEntityRenderDispatcher",
+    "client.MixinScreenEffectRenderer"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "blueflame.refmap.json",
+  "minVersion": "0.8.5"
+}
