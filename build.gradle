@@ -141,7 +141,9 @@ dependencies {
     minecraft "net.minecraftforge:forge:${forgeversion}"
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
+    implementation fg.deobf("curse.maven:jei-238222:3885885")
     implementation fg.deobf("curse.maven:allthemodium-364466:3862033")
+    implementation fg.deobf("curse.maven:spirit-495509:3931224")
 }
 
 mixin {

@@ -6,7 +6,7 @@ import cy.jdkdigital.blueflame.network.PacketHandler;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
@@ -15,13 +15,13 @@ import net.minecraftforge.network.PacketDistributor;
 public class BlueFlameImpl
 {
     private static class DefaultImpl implements IBlueFlameProvider {
-        private final LivingEntity livingEntity;
+        private final Entity entity;
 
         private boolean isOnFire = false;
 
-        private DefaultImpl(LivingEntity livingEntity)
+        private DefaultImpl(Entity entity)
         {
-            this.livingEntity = livingEntity;
+            this.entity = entity;
         }
 
         @Override
@@ -30,20 +30,20 @@ public class BlueFlameImpl
         }
 
         @Override
-        public void sync(LivingEntity livingEntity) {
-            PacketHandler.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity), new FirePacket(livingEntity.getId(), serializeNBT()));
+        public void sync(Entity entity) {
+            PacketHandler.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity), new FirePacket(entity.getId(), serializeNBT()));
         }
 
         @Override
         public void setOnFire() {
             isOnFire = true;
-            sync(livingEntity);
+            sync(entity);
         }
 
         @Override
         public void unsetOnFire() {
             isOnFire = false;
-            sync(livingEntity);
+            sync(entity);
         }
 
         @Override
@@ -66,9 +66,9 @@ public class BlueFlameImpl
         private final DefaultImpl impl;
         private final LazyOptional<IBlueFlameProvider> cap;
 
-        public Provider(LivingEntity livingEntity)
+        public Provider(Entity entity)
         {
-            impl = new DefaultImpl(livingEntity);
+            impl = new DefaultImpl(entity);
             cap = LazyOptional.of(() -> impl);
         }
 
