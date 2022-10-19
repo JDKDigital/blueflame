@@ -43,7 +43,11 @@ public abstract class MixinEntity
     public void setRemainingFireTicks(int remainingFireTicks, CallbackInfo callbackInfo) {
         Entity entity = (Entity) (Object) this;
         if (!entity.level.isClientSide() && remainingFireTicks <= 0) {
-            entity.getCapability(BlueFlame.BLUE_FLAME_CAPABILITY).ifPresent(IBlueFlameProvider::unsetOnFire);
+            entity.getCapability(BlueFlame.BLUE_FLAME_CAPABILITY).ifPresent(iBlueFlameProvider -> {
+                if (iBlueFlameProvider.isOnFire()) {
+                    iBlueFlameProvider.unsetOnFire();
+                }
+            });
         }
     }
 }
