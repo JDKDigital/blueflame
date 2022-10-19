@@ -4,7 +4,6 @@ import cy.jdkdigital.blueflame.BlueFlame;
 import cy.jdkdigital.blueflame.cap.IBlueFlameProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.SoulFireBlock;
@@ -24,8 +23,8 @@ public class MixinBaseFireBlock
             method = {"entityInside(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/Entity;)V"}
     )
     public void entityInside(BlockState blockState, Level level, BlockPos pos, Entity entity, CallbackInfo callbackInfo) {
-        if (!entity.level.isClientSide() && blockState.getBlock() instanceof SoulFireBlock && entity instanceof LivingEntity livingEntity) {
-            livingEntity.getCapability(BlueFlame.BLUE_FLAME_CAPABILITY).ifPresent(IBlueFlameProvider::setOnFire);
+        if (!entity.level.isClientSide() && blockState.getBlock() instanceof SoulFireBlock) {
+            entity.getCapability(BlueFlame.BLUE_FLAME_CAPABILITY).ifPresent(IBlueFlameProvider::setOnFire);
         }
     }
 }

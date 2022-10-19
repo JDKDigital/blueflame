@@ -31,8 +31,6 @@ public class BlueFlame
     {
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         eventBus.addListener(this::commonSetup);
-
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.CONFIG);
     }
 
     @SubscribeEvent

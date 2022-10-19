@@ -19,11 +19,11 @@ public class MixinEntityRenderDispatcher {
 
     @ModifyVariable(method = "renderFlame", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/client/resources/model/Material;sprite()Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;", ordinal = 0), ordinal = 0)
     private TextureAtlasSprite blueFlameVar0(TextureAtlasSprite value, PoseStack poseStack, MultiBufferSource bufferSource, Entity entity) {
-        return entity.getCapability(BlueFlame.BLUE_FLAME_CAPABILITY).filter(IBlueFlameProvider::isOnFire).map(h -> Bakery.soulFireSprite0).orElse(value);
+        return entity.getCapability(BlueFlame.BLUE_FLAME_CAPABILITY).filter(IBlueFlameProvider::isOnFire).map(h -> Bakery.soulFireSprite0.sprite()).orElse(value);
     }
 
     @ModifyVariable(method = "renderFlame", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/client/resources/model/Material;sprite()Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;", ordinal = 1), ordinal = 1)
     private TextureAtlasSprite blueFlameVar1(TextureAtlasSprite value, PoseStack poseStack, MultiBufferSource bufferSource, Entity entity) {
-        return entity.getCapability(BlueFlame.BLUE_FLAME_CAPABILITY).filter(IBlueFlameProvider::isOnFire).map(h -> Bakery.soulFireSprite1).orElse(value);
+        return entity.getCapability(BlueFlame.BLUE_FLAME_CAPABILITY).filter(IBlueFlameProvider::isOnFire).map(h -> Bakery.soulFireSprite1.sprite()).orElse(value);
     }
 }
