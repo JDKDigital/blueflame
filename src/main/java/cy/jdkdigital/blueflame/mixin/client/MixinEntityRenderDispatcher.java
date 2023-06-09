@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-@Debug(export = true)
+//@Debug(export = true)
 @Mixin(value = EntityRenderDispatcher.class)
 public class MixinEntityRenderDispatcher {
 

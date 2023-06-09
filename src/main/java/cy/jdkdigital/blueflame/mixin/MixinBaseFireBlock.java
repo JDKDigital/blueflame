@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Debug(export = true)
+//@Debug(export = true)
 @Mixin(value = BaseFireBlock.class)
 public class MixinBaseFireBlock
 {
@@ -23,7 +23,7 @@ public class MixinBaseFireBlock
             method = {"entityInside(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/Entity;)V"}
     )
     public void entityInside(BlockState blockState, Level level, BlockPos pos, Entity entity, CallbackInfo callbackInfo) {
-        if (!entity.level.isClientSide() && blockState.getBlock() instanceof SoulFireBlock) {
+        if (!entity.level().isClientSide() && blockState.getBlock() instanceof SoulFireBlock) {
             entity.getCapability(BlueFlame.BLUE_FLAME_CAPABILITY).ifPresent(IBlueFlameProvider::setOnFire);
         }
     }

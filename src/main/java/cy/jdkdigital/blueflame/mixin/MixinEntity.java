@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Debug(export = true)
+//@Debug(export = true)
 @Mixin(value = Entity.class)
 public abstract class MixinEntity
 {
@@ -22,14 +22,14 @@ public abstract class MixinEntity
     public void lavaHurt(CallbackInfo callbackInfo) {
         // Fix for entities touching the side of lava
         Entity entity = (Entity) (Object) this;
-        if (!entity.level.isClientSide()) {
+        if (!entity.level().isClientSide()) {
             AABB aabb = entity.getBoundingBox().deflate(0.001D);
             BlockPos.MutableBlockPos mutableBlockpos = new BlockPos.MutableBlockPos();
             for(int l1 = Mth.floor(aabb.minX); l1 < Mth.ceil(aabb.maxX); ++l1) {
                 for(int i2 = Mth.floor(aabb.minY); i2 < Mth.ceil(aabb.maxY); ++i2) {
                     for(int j2 = Mth.floor(aabb.minZ); j2 < Mth.ceil(aabb.maxZ); ++j2) {
                         mutableBlockpos.set(l1, i2, j2);
-                        FluidState fluidstate = entity.level.getFluidState(mutableBlockpos);
+                        FluidState fluidstate = entity.level().getFluidState(mutableBlockpos);
                         if (fluidstate.is(ModTags.SOUL_FLAME_SOURCE)) {
                             entity.getCapability(BlueFlame.BLUE_FLAME_CAPABILITY).ifPresent(IBlueFlameProvider::setOnFire);
                         }
@@ -42,7 +42,7 @@ public abstract class MixinEntity
     @Inject(at = {@At("HEAD")}, method = {"setRemainingFireTicks(I)V"})
     public void setRemainingFireTicks(int remainingFireTicks, CallbackInfo callbackInfo) {
         Entity entity = (Entity) (Object) this;
-        if (!entity.level.isClientSide() && remainingFireTicks <= 0) {
+        if (!entity.level().isClientSide() && remainingFireTicks <= 0) {
             entity.getCapability(BlueFlame.BLUE_FLAME_CAPABILITY).ifPresent(iBlueFlameProvider -> {
                 if (iBlueFlameProvider.isOnFire()) {
                     iBlueFlameProvider.unsetOnFire();
