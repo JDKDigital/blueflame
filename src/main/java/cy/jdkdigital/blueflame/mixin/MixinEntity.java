@@ -1,14 +1,12 @@
 package cy.jdkdigital.blueflame.mixin;
 
 import cy.jdkdigital.blueflame.BlueFlame;
-import cy.jdkdigital.blueflame.cap.IBlueFlameProvider;
 import cy.jdkdigital.blueflame.init.ModTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
-import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -31,7 +29,7 @@ public abstract class MixinEntity
                         mutableBlockpos.set(l1, i2, j2);
                         FluidState fluidstate = entity.level().getFluidState(mutableBlockpos);
                         if (fluidstate.is(ModTags.SOUL_FLAME_SOURCE)) {
-                            entity.getCapability(BlueFlame.BLUE_FLAME_CAPABILITY).ifPresent(IBlueFlameProvider::setOnFire);
+                            entity.getData(BlueFlame.BLUE_FLAME_HANDLER).setOnFire(entity);
                         }
                     }
                 }
@@ -43,11 +41,10 @@ public abstract class MixinEntity
     public void setRemainingFireTicks(int remainingFireTicks, CallbackInfo callbackInfo) {
         Entity entity = (Entity) (Object) this;
         if (!entity.level().isClientSide() && remainingFireTicks <= 0) {
-            entity.getCapability(BlueFlame.BLUE_FLAME_CAPABILITY).ifPresent(iBlueFlameProvider -> {
-                if (iBlueFlameProvider.isOnFire()) {
-                    iBlueFlameProvider.unsetOnFire();
-                }
-            });
+            var data = entity.getData(BlueFlame.BLUE_FLAME_HANDLER);
+            if (data.isOnFire()) {
+                data.unsetOnFire(entity);
+            }
         }
     }
 }

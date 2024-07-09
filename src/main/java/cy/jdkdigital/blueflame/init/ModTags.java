@@ -8,5 +8,5 @@ import net.minecraft.world.level.material.Fluid;
 
 public class ModTags
 {
-    public static final TagKey<Fluid> SOUL_FLAME_SOURCE = FluidTags.create(new ResourceLocation(BlueFlame.MODID, "soul_flame_source"));
+    public static final TagKey<Fluid> SOUL_FLAME_SOURCE = FluidTags.create(ResourceLocation.fromNamespaceAndPath(BlueFlame.MODID, "soul_flame_source"));
 }

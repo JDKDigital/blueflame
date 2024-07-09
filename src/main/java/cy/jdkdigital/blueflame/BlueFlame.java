@@ -1,20 +1,20 @@
 package cy.jdkdigital.blueflame;
 
 import com.mojang.logging.LogUtils;
-import cy.jdkdigital.blueflame.cap.IBlueFlameProvider;
-import cy.jdkdigital.blueflame.network.PacketHandler;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import cy.jdkdigital.blueflame.cap.BlueFlameHandler;
+import cy.jdkdigital.blueflame.network.FirePacket;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.slf4j.Logger;
+
+import java.util.function.Supplier;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(BlueFlame.MODID)
@@ -25,22 +25,25 @@ public class BlueFlame
 
     public static final String MODID = "blueflame";
 
-    public static final Capability<IBlueFlameProvider> BLUE_FLAME_CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
+    public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, MODID);
+    public static final Supplier<AttachmentType<BlueFlameHandler>> BLUE_FLAME_HANDLER = ATTACHMENT_TYPES.register("blue_flame_handler", () -> AttachmentType.serializable(BlueFlameHandler::new).build());
 
-    public BlueFlame()
+    public BlueFlame(IEventBus modEventBus, ModContainer modContainer)
     {
-        IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        eventBus.addListener(this::commonSetup);
+        modEventBus.addListener(this::payloadHandler);
+
+        ATTACHMENT_TYPES.register(modEventBus);
     }
 
-    @SubscribeEvent
-    public static void registerCap(RegisterCapabilitiesEvent event)
-    {
-        event.register(IBlueFlameProvider.class);
-    }
-
-    private void commonSetup(FMLCommonSetupEvent event)
-    {
-        PacketHandler.register();
+    public void payloadHandler(RegisterPayloadHandlersEvent event) {
+        final PayloadRegistrar registrar = event.registrar(MODID).versioned("1").optional();
+        registrar.playToClient(
+                FirePacket.TYPE,
+                FirePacket.STREAM_CODEC,
+                new DirectionalPayloadHandler<>(
+                        FirePacket::clientHandle,
+                        FirePacket::serverHandle
+                )
+        );
     }
 }

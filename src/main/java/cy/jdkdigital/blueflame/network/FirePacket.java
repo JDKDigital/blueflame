@@ -5,52 +5,45 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import java.util.function.Supplier;
-
-public class FirePacket
+public record FirePacket(int entityID, CompoundTag data) implements CustomPacketPayload
 {
-    private final CompoundTag nbt;
-    private final int entityID;
+    public static final CustomPacketPayload.Type<FirePacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(BlueFlame.MODID, "fire_packet"));
 
-    public FirePacket(int entityID, CompoundTag nbt)
-    {
-        this.nbt = nbt;
-        this.entityID = entityID;
+    public static final StreamCodec<FriendlyByteBuf, FirePacket> STREAM_CODEC = CustomPacketPayload.codec(FirePacket::write, FirePacket::new);
+
+    private FirePacket(FriendlyByteBuf buffer) {
+        this(buffer.readInt(), ByteBufCodecs.fromCodec(CompoundTag.CODEC).decode(buffer));
     }
 
-    public static void encode(FirePacket msg, FriendlyByteBuf buf)
-    {
-        buf.writeInt(msg.entityID);
-        buf.writeNbt(msg.nbt);
+    private void write(FriendlyByteBuf buffer) {
+        buffer.writeInt(this.entityID);
+        ByteBufCodecs.fromCodec(CompoundTag.CODEC).encode(buffer, data);
     }
 
-    public static FirePacket decode(FriendlyByteBuf buf)
-    {
-        return new FirePacket(buf.readInt(), buf.readNbt());
-    }
+    public static void clientHandle(final FirePacket data, final IPayloadContext context) {
+        ClientLevel level = Minecraft.getInstance().level;
 
-    public static class Handler
-    {
-        public static void handle(final FirePacket message, Supplier<NetworkEvent.Context> ctx)
-        {
-            ctx.get().enqueueWork(() ->
-            {
-                ClientLevel world = Minecraft.getInstance().level;
+        if (level != null) {
+            Entity entity = level.getEntity(data.entityID);
 
-                if (world != null) {
-                    Entity entity = world.getEntity(message.entityID);
-
-                    if (entity != null) {
-                        entity.getCapability(BlueFlame.BLUE_FLAME_CAPABILITY).ifPresent(iBlueFlameProvider -> {
-                            iBlueFlameProvider.deserializeNBT(message.nbt);
-                        });
-                    }
-                }
-            });
-            ctx.get().setPacketHandled(true);
+            if (entity != null) {
+                entity.getData(BlueFlame.BLUE_FLAME_HANDLER).deserializeNBT(level.registryAccess(), data.data());
+            }
         }
+    }
+
+    public static void serverHandle(final FirePacket data, final IPayloadContext context) {
+    }
+
+    @Override
+    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

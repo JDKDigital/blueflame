@@ -1,14 +1,12 @@
 package cy.jdkdigital.blueflame.mixin;
 
 import cy.jdkdigital.blueflame.BlueFlame;
-import cy.jdkdigital.blueflame.cap.IBlueFlameProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.SoulFireBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,7 +22,7 @@ public class MixinBaseFireBlock
     )
     public void entityInside(BlockState blockState, Level level, BlockPos pos, Entity entity, CallbackInfo callbackInfo) {
         if (!entity.level().isClientSide() && blockState.getBlock() instanceof SoulFireBlock) {
-            entity.getCapability(BlueFlame.BLUE_FLAME_CAPABILITY).ifPresent(IBlueFlameProvider::setOnFire);
+            entity.getData(BlueFlame.BLUE_FLAME_HANDLER).setOnFire(entity);
         }
     }
 }
